@@ -19,13 +19,13 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     TRANSFORMERS_OFFLINE=1
 
 COPY pyproject.toml uv.lock README.md ./
-RUN uv sync --frozen --no-dev --extra ocr-deepseek --no-install-project
+RUN uv sync --no-dev --extra ocr-deepseek --no-install-project
 
 COPY app ./app
 COPY main.py ./
 COPY .env.example ./
 
-RUN uv sync --frozen --no-dev --extra ocr-deepseek
+RUN uv sync --no-dev --extra ocr-deepseek
 
 EXPOSE 8000
 

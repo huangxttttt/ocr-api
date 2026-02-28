@@ -22,25 +22,33 @@ def extract_text(
 
 @router.post("/scan", response_model=OCRScanResponse)
 async def scan_image(
-    file: UploadFile = File(...),
+    file: UploadFile | None = File(default=None),
+    image: UploadFile | None = File(default=None),
     service: OCRService = Depends(get_ocr_service),
 ) -> OCRScanResponse:
     settings = get_settings()
+    upload = file or image
 
-    if not file.filename:
+    if upload is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing upload file. Use form field 'file' or 'image'.",
+        )
+
+    if not upload.filename:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Missing file name",
         )
 
-    ext = Path(file.filename).suffix.lower()
+    ext = Path(upload.filename).suffix.lower()
     if ext not in settings.ocr_scan_allowed_extensions:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unsupported file extension: {ext}",
         )
 
-    image_bytes = await file.read()
+    image_bytes = await upload.read()
     if len(image_bytes) > settings.ocr_scan_max_file_size:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
@@ -64,4 +72,3 @@ async def scan_image(
         ) from exc
 
     return OCRScanResponse(text=text)
-

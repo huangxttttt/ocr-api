@@ -36,3 +36,17 @@ def test_ocr_scan_rejects_unsupported_extension() -> None:
         app.dependency_overrides.clear()
 
     assert response.status_code == 400
+
+
+def test_ocr_scan_accepts_image_field_alias() -> None:
+    app.dependency_overrides[get_ocr_service] = lambda: _FakeOCRService()
+    try:
+        response = client.post(
+            "/api/v1/ocr/scan",
+            files={"image": ("invoice.png", b"fake-image-bytes", "image/png")},
+        )
+    finally:
+        app.dependency_overrides.clear()
+
+    assert response.status_code == 200
+    assert response.json()["text"] == "mocked-16"
