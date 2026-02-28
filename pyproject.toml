@@ -26,5 +26,8 @@ ocr-deepseek = [
     "transformers>=4.46.0,<5.0.0",
 ]
 
+[tool.setuptools.packages.find]
+include = ["app*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
