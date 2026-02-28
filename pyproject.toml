@@ -24,7 +24,12 @@ dev = [
 ocr-deepseek = [
     "addict>=2.4.0,<3.0.0",
     "einops>=0.8.0,<1.0.0",
+    "easydict>=1.13,<2.0",
+    "img2pdf>=0.5.1,<1.0.0",
     "matplotlib>=3.9.0,<4.0.0",
+    "numpy>=1.26.0,<3.0.0",
+    "PyMuPDF>=1.24.0,<2.0.0",
+    "tokenizers==0.20.3",
     "torch>=2.4.0,<3.0.0",
     "torchvision>=0.19.0,<1.0.0",
     "transformers>=4.46.0,<5.0.0",
