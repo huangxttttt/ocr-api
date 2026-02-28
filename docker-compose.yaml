@@ -10,11 +10,11 @@ services:
       - "8000:8000"
     environment:
       DEEPSEEK_DEVICE: cuda
-      DEEPSEEK_MODEL_PATH: /app/models/DeepSeek-OCR
+      DEEPSEEK_MODEL_PATH: /app/models/DeepSeek-OCR-2
       HF_HUB_OFFLINE: "1"
       TRANSFORMERS_OFFLINE: "1"
     volumes:
-      - ./models:/app/models:ro
+      - /data/ai/models:/app/models:ro
     deploy:
       resources:
         reservations:
