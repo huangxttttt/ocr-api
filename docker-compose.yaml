@@ -8,11 +8,13 @@ services:
     restart: unless-stopped
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
-      DEEPSEEK_DEVICE: cuda
-      DEEPSEEK_MODEL_PATH: /app/models/DeepSeek-OCR-2
-      HF_HUB_OFFLINE: "1"
-      TRANSFORMERS_OFFLINE: "1"
+      DEEPSEEK_DEVICE: ${DEEPSEEK_DEVICE:-cuda}
+      DEEPSEEK_MODEL_PATH: ${DEEPSEEK_MODEL_PATH:-/app/models/DeepSeek-OCR-2}
+      HF_HUB_OFFLINE: ${HF_HUB_OFFLINE:-1}
+      TRANSFORMERS_OFFLINE: ${TRANSFORMERS_OFFLINE:-1}
     volumes:
       - /data/ai/models:/app/models:ro
     deploy:
