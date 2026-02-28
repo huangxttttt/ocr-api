@@ -1,0 +1,24 @@
+services:
+  ocr-api:
+    container_name: ocr-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bill73777/ocr-api:latest
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DEEPSEEK_DEVICE: cuda
+      DEEPSEEK_MODEL_PATH: /app/models/DeepSeek-OCR
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
+    volumes:
+      - ./models:/app/models:ro
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["0"]
+              capabilities: [gpu]
