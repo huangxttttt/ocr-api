@@ -39,6 +39,10 @@ uvicorn app.main:app --reload
 OCR scanning uses DeepSeek OCR model only.
 Model is loaded from local path only (no online download).
 Default local path: `./models/DeepSeek-OCR` (config: `DEEPSEEK_MODEL_PATH`).
+Recommended DeepSeek runtime knobs:
+- `DEEPSEEK_CROP_MODE=true|false` (boolean only)
+- `DEEPSEEK_TEST_COMPRESS=false` (disable compression test path in production)
+- `transformers==4.46.3` for best compatibility with upstream DeepSeek OCR code
 
 ### Docker
 

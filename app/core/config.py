@@ -22,7 +22,8 @@ class Settings(BaseSettings):
     deepseek_prompt: str = "<image>\n<|grounding|>Convert the document to markdown. "
     deepseek_base_size: int = 1024
     deepseek_image_size: int = 1024
-    deepseek_crop_mode: str = "none"
+    deepseek_crop_mode: bool | str = False
+    deepseek_test_compress: bool = False
     deepseek_device: str = "cuda"
     deepseek_use_bfloat16: bool = True
 
