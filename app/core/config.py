@@ -20,8 +20,6 @@ class Settings(BaseSettings):
     )
     deepseek_model_path: str = "models/DeepSeek-OCR"
     deepseek_prompt: str = "<image>\n<|grounding|>Convert the document to markdown. "
-    deepseek_enforce_verbatim: bool = True
-    deepseek_unreadable_placeholder: str = "[UNREADABLE]"
     deepseek_base_size: int = 1024
     deepseek_image_size: int = 1024
     deepseek_crop_mode: bool | str = False
