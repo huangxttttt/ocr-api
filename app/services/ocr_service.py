@@ -28,6 +28,26 @@ class OCRService:
         return content.strip()
 
     @staticmethod
+    def _build_scan_prompt(
+        base_prompt: str,
+        enforce_verbatim: bool,
+        unreadable_placeholder: str,
+    ) -> str:
+        if not enforce_verbatim:
+            return base_prompt
+
+        strict_rules = (
+            "OCR transcription rules (must follow):\n"
+            "- Only transcribe content that is visible in the image.\n"
+            "- Do not infer, guess, or autocomplete missing/blurred/occluded text.\n"
+            "- For tables, preserve row/column structure and reading order exactly.\n"
+            "- Do not add new rows/columns or fill blank cells with generated values.\n"
+            f"- If a cell/word is unreadable, use {unreadable_placeholder}.\n"
+            "- Keep numbers, punctuation, symbols, and units exactly as seen.\n"
+        )
+        return f"{base_prompt.rstrip()}\n\n{strict_rules}".strip()
+
+    @staticmethod
     def _resolve_local_model_path(raw_path: str) -> Path:
         model_path = Path(raw_path)
         if not model_path.is_absolute():
@@ -188,6 +208,11 @@ class OCRService:
 
         settings = get_settings()
         model, tokenizer = self._ensure_deepseek_runtime()
+        prompt = self._build_scan_prompt(
+            base_prompt=settings.deepseek_prompt,
+            enforce_verbatim=settings.deepseek_enforce_verbatim,
+            unreadable_placeholder=settings.deepseek_unreadable_placeholder,
+        )
 
         try:
             with Image.open(BytesIO(image_bytes)) as source_image:
@@ -204,7 +229,7 @@ class OCRService:
 
             crop_mode = self._normalize_crop_mode(settings.deepseek_crop_mode)
             infer_kwargs = {
-                "prompt": settings.deepseek_prompt,
+                "prompt": prompt,
                 "image_file": str(input_path),
                 "output_path": str(output_dir),
             }

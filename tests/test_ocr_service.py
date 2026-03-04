@@ -34,3 +34,27 @@ def test_build_inference_error_message_adds_hints(monkeypatch: pytest.MonkeyPatc
     assert "DEEPSEEK_TEST_COMPRESS=false" in message
     assert "DEEPSEEK_CROP_MODE=false" in message
     assert "transformers==4.57.6" in message
+
+
+def test_build_scan_prompt_adds_strict_rules() -> None:
+    prompt = OCRService._build_scan_prompt(
+        base_prompt="<image>\n<|grounding|>Convert the document to markdown.",
+        enforce_verbatim=True,
+        unreadable_placeholder="[UNREADABLE]",
+    )
+
+    assert "Only transcribe content that is visible" in prompt
+    assert "Do not infer, guess, or autocomplete" in prompt
+    assert "For tables, preserve row/column structure" in prompt
+    assert "[UNREADABLE]" in prompt
+
+
+def test_build_scan_prompt_returns_original_when_verbatim_disabled() -> None:
+    base_prompt = "<image>\n<|grounding|>Convert the document to markdown."
+    prompt = OCRService._build_scan_prompt(
+        base_prompt=base_prompt,
+        enforce_verbatim=False,
+        unreadable_placeholder="[UNREADABLE]",
+    )
+
+    assert prompt == base_prompt
