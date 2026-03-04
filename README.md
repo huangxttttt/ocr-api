@@ -42,6 +42,8 @@ Default local path: `./models/DeepSeek-OCR` (config: `DEEPSEEK_MODEL_PATH`).
 Recommended DeepSeek runtime knobs:
 - `DEEPSEEK_CROP_MODE=true|false` (boolean only)
 - `DEEPSEEK_TEST_COMPRESS=false` (disable compression test path in production)
+- `DEEPSEEK_ENFORCE_VERBATIM=true` (avoid OCR hallucination; do not guess table cells)
+- `DEEPSEEK_UNREADABLE_PLACEHOLDER=[UNREADABLE]` (placeholder for unreadable cell/text)
 - `transformers==4.46.3` for best compatibility with upstream DeepSeek OCR code
 
 ### Docker
