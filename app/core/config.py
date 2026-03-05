@@ -9,6 +9,9 @@ class Settings(BaseSettings):
     debug: bool = False
     api_v1_prefix: str = "/api/v1"
     ocr_scan_max_file_size: int = 10 * 1024 * 1024
+    ocr_scan_max_concurrency: int = 1
+    ocr_scan_queue_timeout_seconds: float = 30.0
+    ocr_scan_warmup_on_startup: bool = False
     ocr_scan_allowed_extensions: tuple[str, ...] = (
         ".png",
         ".jpg",

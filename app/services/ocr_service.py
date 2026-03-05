@@ -5,6 +5,7 @@ from importlib import metadata
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from threading import Lock
+import time
 from typing import Any
 
 from PIL import Image, UnidentifiedImageError
@@ -153,6 +154,7 @@ class OCRService:
 
             cls._warn_on_transformers_version()
 
+            load_started_at = time.perf_counter()
             try:
                 tokenizer = AutoTokenizer.from_pretrained(
                     str(model_path),
@@ -180,7 +182,18 @@ class OCRService:
 
             cls._deepseek_model = model
             cls._deepseek_tokenizer = tokenizer
+            LOGGER.info(
+                "DeepSeek runtime initialized in %.3fs (device=%s, bfloat16=%s, model=%s)",
+                time.perf_counter() - load_started_at,
+                settings.deepseek_device,
+                settings.deepseek_use_bfloat16,
+                model_path,
+            )
             return model, tokenizer
+
+    @classmethod
+    def warmup_runtime(cls) -> None:
+        cls._ensure_deepseek_runtime()
 
     def extract_text_from_image(self, image_bytes: bytes) -> str:
         if not image_bytes:

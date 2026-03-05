@@ -36,10 +36,19 @@ pip install -e ".[dev,ocr-deepseek]"
 uvicorn app.main:app --reload
 ```
 
+Production run (no reload):
+
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
 OCR scanning uses DeepSeek OCR model only.
 Model is loaded from local path only (no online download).
 Default local path: `./models/DeepSeek-OCR` (config: `DEEPSEEK_MODEL_PATH`).
 Recommended DeepSeek runtime knobs:
+- `OCR_SCAN_MAX_CONCURRENCY=1` (limit concurrent `/scan` inference in each process)
+- `OCR_SCAN_QUEUE_TIMEOUT_SECONDS=30` (fail fast with `429` when queue wait is too long)
+- `OCR_SCAN_WARMUP_ON_STARTUP=true` (optional model warmup to reduce first-request latency)
 - `DEEPSEEK_CROP_MODE=true|false` (boolean only)
 - `DEEPSEEK_TEST_COMPRESS=false` (disable compression test path in production)
 - `transformers==4.46.3` for best compatibility with upstream DeepSeek OCR code
