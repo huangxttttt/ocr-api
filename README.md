@@ -47,6 +47,7 @@ Model is loaded from local path only (no online download).
 Default local path: `./models/DeepSeek-OCR` (config: `DEEPSEEK_MODEL_PATH`).
 Recommended DeepSeek runtime knobs:
 - `OCR_SCAN_MAX_CONCURRENCY=1` (limit concurrent `/scan` inference in each process)
+- Multi-instance compose uses `OCR_SCAN_MAX_CONCURRENCY_GPU0` / `OCR_SCAN_MAX_CONCURRENCY_GPU1` (keep each at `1` first, then tune carefully)
 - `OCR_SCAN_QUEUE_TIMEOUT_SECONDS=30` (fail fast with `429` when queue wait is too long)
 - `OCR_SCAN_WARMUP_ON_STARTUP=true` (optional model warmup to reduce first-request latency)
 - `DEEPSEEK_CROP_MODE=true|false` (boolean only)
@@ -81,10 +82,28 @@ docker run --rm --gpus all -p 8000:8000 \
   ocr-api:latest
 ```
 
-Docker Compose (GPU):
+Docker Compose (GPU, single instance):
 
 ```bash
+cp .env.example .env
 docker compose up -d --build
+```
+
+Docker Compose (GPU, 2 cards + 2 instances + 1 load balancer):
+
+```bash
+cp .env.example .env
+docker compose -f docker-compose.multi-gpu.yaml up -d --build
+```
+
+Multi-instance compose notes:
+- Public endpoint remains `http://127.0.0.1:8000` (served by `ocr-api-lb`)
+- `ocr-api-gpu0` is pinned to GPU `0`; `ocr-api-gpu1` is pinned to GPU `1`
+- Tune per-instance concurrency in `.env`:
+
+```bash
+OCR_SCAN_MAX_CONCURRENCY_GPU0=1
+OCR_SCAN_MAX_CONCURRENCY_GPU1=1
 ```
 
 Before compose startup, place your pre-downloaded model files under:

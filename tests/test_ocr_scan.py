@@ -50,3 +50,19 @@ def test_ocr_scan_accepts_image_field_alias() -> None:
 
     assert response.status_code == 200
     assert response.json()["text"] == "mocked-16"
+
+
+def test_ocr_scan_trailing_slash_does_not_redirect() -> None:
+    app.dependency_overrides[get_ocr_service] = lambda: _FakeOCRService()
+    try:
+        response = client.post(
+            "/api/v1/ocr/scan/",
+            files={"file": ("invoice.png", b"fake-image-bytes", "image/png")},
+            follow_redirects=False,
+        )
+    finally:
+        app.dependency_overrides.clear()
+
+    assert response.status_code == 200
+    assert "location" not in response.headers
+    assert response.json()["text"] == "mocked-16"

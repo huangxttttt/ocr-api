@@ -39,6 +39,7 @@ def extract_text(
 
 
 @router.post("/scan", response_model=OCRScanResponse)
+@router.post("/scan/", response_model=OCRScanResponse, include_in_schema=False)
 async def scan_image(
     file: UploadFile | None = File(default=None),
     image: UploadFile | None = File(default=None),

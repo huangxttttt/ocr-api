@@ -1,0 +1,67 @@
+services:
+  ocr-api-gpu0:
+    container_name: ocr-api-gpu0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bill73777/ocr-api:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      OCR_SCAN_MAX_CONCURRENCY: ${OCR_SCAN_MAX_CONCURRENCY_GPU0:-1}
+      OCR_SCAN_QUEUE_TIMEOUT_SECONDS: ${OCR_SCAN_QUEUE_TIMEOUT_SECONDS:-30}
+      OCR_SCAN_WARMUP_ON_STARTUP: ${OCR_SCAN_WARMUP_ON_STARTUP:-false}
+      DEEPSEEK_DEVICE: ${DEEPSEEK_DEVICE:-cuda}
+      DEEPSEEK_MODEL_PATH: ${DEEPSEEK_MODEL_PATH:-/app/models/DeepSeek-OCR-2}
+      DEEPSEEK_CROP_MODE: ${DEEPSEEK_CROP_MODE:-false}
+      DEEPSEEK_TEST_COMPRESS: ${DEEPSEEK_TEST_COMPRESS:-false}
+      HF_HUB_OFFLINE: ${HF_HUB_OFFLINE:-1}
+      TRANSFORMERS_OFFLINE: ${TRANSFORMERS_OFFLINE:-1}
+    volumes:
+      - /data/ai/models:/app/models:ro
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["0"]
+              capabilities: [gpu]
+
+  ocr-api-gpu1:
+    container_name: ocr-api-gpu1
+    image: bill73777/ocr-api:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      OCR_SCAN_MAX_CONCURRENCY: ${OCR_SCAN_MAX_CONCURRENCY_GPU1:-1}
+      OCR_SCAN_QUEUE_TIMEOUT_SECONDS: ${OCR_SCAN_QUEUE_TIMEOUT_SECONDS:-30}
+      OCR_SCAN_WARMUP_ON_STARTUP: ${OCR_SCAN_WARMUP_ON_STARTUP:-false}
+      DEEPSEEK_DEVICE: ${DEEPSEEK_DEVICE:-cuda}
+      DEEPSEEK_MODEL_PATH: ${DEEPSEEK_MODEL_PATH:-/app/models/DeepSeek-OCR-2}
+      DEEPSEEK_CROP_MODE: ${DEEPSEEK_CROP_MODE:-false}
+      DEEPSEEK_TEST_COMPRESS: ${DEEPSEEK_TEST_COMPRESS:-false}
+      HF_HUB_OFFLINE: ${HF_HUB_OFFLINE:-1}
+      TRANSFORMERS_OFFLINE: ${TRANSFORMERS_OFFLINE:-1}
+    volumes:
+      - /data/ai/models:/app/models:ro
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["1"]
+              capabilities: [gpu]
+
+  ocr-api-lb:
+    container_name: ocr-api-lb
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      - ocr-api-gpu0
+      - ocr-api-gpu1
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./deploy/nginx/ocr-api-upstream.conf:/etc/nginx/conf.d/default.conf:ro
